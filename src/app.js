@@ -21,10 +21,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     connect()
         .then(result => {
-            updateDisplay('<h2>Connection Successful</h2>');
-            updateDisplay('<pre>' + JSON.stringify(result, null, 2) + '</pre>');
-            console.log('Connect result:', result);
-            return tvGet('/account/list');
+            if (result.accessToken) {
+                updateDisplay('<h2>Connection Successful</h2>');
+                updateDisplay('<pre>Access Token: ' + result.accessToken.substring(0, 10) + '...' + '</pre>');
+                updateDisplay('<pre>Expiration Time: ' + result.expirationTime + '</pre>');
+                console.log('Connect result:', result);
+                return tvGet('/account/list');
+            } else {
+                throw new Error('No access token received');
+            }
         })
         .then(accounts => {
             updateDisplay('<h2>Account List</h2>');
