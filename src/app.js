@@ -4,20 +4,36 @@ import { credentials } from '../config/credentials';
 import { URLs } from '../config/urls';
 import { connect } from './connect';
 
-document.addEventListener('DOMContentLoaded', () => {
+function updateDisplay(content) {
     const root = document.getElementById('root');
     if (root) {
-        root.innerHTML = '<h1>Hello World! Tradovate API Project is running.</h1>';
+        root.innerHTML += content;
     }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateDisplay('<h1>Tradovate API Project</h1>');
+    updateDisplay('<p>Initializing...</p>');
 
     console.log('Tradovate API Project initialized');
     console.log('Credentials:', credentials);
     console.log('URLs:', URLs);
 
-    // Test connect function
-    connect().then(result => {
-        console.log('Connect result:', result);
-    }).catch(error => {
-        console.error('Connect error:', error);
-    });
+    connect()
+        .then(result => {
+            updateDisplay('<h2>Connection Successful</h2>');
+            updateDisplay('<pre>' + JSON.stringify(result, null, 2) + '</pre>');
+            console.log('Connect result:', result);
+            return tvGet('/account/list');
+        })
+        .then(accounts => {
+            updateDisplay('<h2>Account List</h2>');
+            updateDisplay('<pre>' + JSON.stringify(accounts, null, 2) + '</pre>');
+            console.log('Account list:', accounts);
+        })
+        .catch(error => {
+            updateDisplay('<h2>Error</h2>');
+            updateDisplay('<p>' + error.message + '</p>');
+            console.error('Error:', error);
+        });
 });
